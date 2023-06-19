@@ -1,17 +1,17 @@
-const ClientError = require('../../exceptions/ClientError');
+const ClientError = require('../../../exceptions/ClientError');
 class NotesHandler {
     constructor(service, validator) {
       this._service = service;
       this._validator = validator;
 
-      this.postNoteHandler = this.postNoteHandler.bind(this);
-      this.getNotesHandler = this.getNotesHandler.bind(this);
-      this.getNoteByIdHandler = this.getNoteByIdHandler.bind(this);
-      this.putNoteByIdHandler = this.putNoteByIdHandler.bind(this);
-      this.deleteNoteByIdHandler = this.deleteNoteByIdHandler.bind(this);
+      this.postOpenMusikHandler = this.postOpenMusikHandler.bind(this);
+      this.getOpenMusikHandler = this.getOpenMusikHandler.bind(this);
+      this.getOpenMusikByIdHandler = this.getOpenMusikByIdHandler.bind(this);
+      this.putOpenMusikByIdHandler = this.putOpenMusikByIdHandler.bind(this);
+      this.deleteOpenMusikByIdHandler = this.deleteOpenMusikByIdHandler.bind(this);
     }
    
-    async postNoteHandler(request, h) {
+    async postOpenMusikHandler(request, h) {
         try{
         this._validator.validateNotePayload(request.payload);
         const { title = 'untitled', body, tags } = request.payload;
@@ -45,7 +45,7 @@ class NotesHandler {
               return response;                 
         }
     }
-    async getNotesHandler() {
+    async getOpenMusikHandler() {
         const notes = await this._service.getNotes();
         return {
             status: 'success',
@@ -54,7 +54,7 @@ class NotesHandler {
             },
         };
     }
-    async getNoteByIdHandler(request, h) {
+    async getOpenMusikByIdHandler(request, h) {
         try{
         const { id } = request.params;
         const note = await this._service.getNoteById(id);
@@ -85,7 +85,7 @@ class NotesHandler {
         }
                 
     }
-    async putNoteByIdHandler(request, h) {
+    async putOpenMusikByIdHandler(request, h) {
         try{
         this._validator.validateNotePayload(request.payload);
         const { title, body, tags } = request.payload;
@@ -116,7 +116,7 @@ class NotesHandler {
             }
 
     }
-    async deleteNoteByIdHandler(request, h) {
+    async deleteOpenMusikByIdHandler(request, h) {
       try{
       const { id } = request.params;
       await this._service.deleteNoteById(id);

@@ -1,13 +1,13 @@
 // mengimpor dotenv dan menjalankan konfigurasinya
 require('dotenv').config();
 const Hapi = require('@hapi/hapi');
-const notes = require('./api/notes');
-const NotesService = require('./services/postgres/NotesService');
-const NotesValidator = require('./validator/notes');
+const Album = require('./api/openmusik/albums');
+const AlbumService = require('./services/postgres/AlbumsService');
+const AlbumValidator = require('./validator/albums');
 
  
 const init = async () => {
-  const notesService = new NotesService();
+  const albumService = new AlbumService();
   const server = Hapi.server({
     port: process.env.PORT,
     host: process.env.HOST,
@@ -19,10 +19,10 @@ const init = async () => {
   });
  
   await server.register({
-    plugin: notes,
+    plugin: Album,
     options: {
-      service: notesService,
-      validator: NotesValidator,
+      service: albumService,
+      validator: AlbumValidator,
     },
   });
  
