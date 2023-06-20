@@ -9,10 +9,16 @@ const SongsService = require('./services/postgres/SongsService');
 const AlbumValidator = require('./validator/albums');
 const SongValidator = require('./validator/songs');
 
+// users
+const users = require('./api/users');
+const UsersService = require('./services/postgres/UsersService');
+const UsersValidator = require('./validator/users');
+
  
 const init = async () => {
   const albumService = new AlbumService();
   const songService = new SongsService();
+  const usersService = new UsersService();
   const server = Hapi.server({
     port: process.env.PORT,
     host: process.env.HOST,
@@ -23,20 +29,29 @@ const init = async () => {
     },
   });
   
-  await server.register({
+  await server.register([
+    {
     plugin: Album,
     options: {
       service: albumService,
       validator: AlbumValidator,
-    }
-  });
-  await server.register({
-    plugin: Song,
+      },
+    },
+    {
+      plugin: users,
+      options: {
+        service: usersService,
+        validator: UsersValidator,
+      },
+    },
+    {
+      plugin: Song,
     options: {
       service: songService,
       validator: SongValidator,
-    }
-  });
+    },
+  },
+  ]);
   server.ext('onPreResponse', (request, h) => {
     // mendapatkan konteks response dari request
     const { response } = request;
