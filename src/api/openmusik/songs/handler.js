@@ -1,149 +1,66 @@
-const ClientError = require('../../../exceptions/ClientError');
-class NotesHandler {
+class SongsHandler {
     constructor(service, validator) {
       this._service = service;
       this._validator = validator;
 
-      this.postOpenMusikHandler = this.postOpenMusikHandler.bind(this);
-      this.getOpenMusikHandler = this.getOpenMusikHandler.bind(this);
-      this.getOpenMusikByIdHandler = this.getOpenMusikByIdHandler.bind(this);
-      this.putOpenMusikByIdHandler = this.putOpenMusikByIdHandler.bind(this);
-      this.deleteOpenMusikByIdHandler = this.deleteOpenMusikByIdHandler.bind(this);
+      this.postSongsHandler = this.postSongsHandler.bind(this);
+      this.getSongsHandler = this.getSongsHandler.bind(this);
+      this.getSongsByIdHandler = this.getSongsByIdHandler.bind(this);
+      this.putSongsByIdHandler = this.putSongsByIdHandler.bind(this);
+      this.deleteSongsByIdHandler = this.deleteSongsByIdHandler.bind(this);
     }
    
-    async postOpenMusikHandler(request, h) {
-        try{
-        this._validator.validateNotePayload(request.payload);
-        const { title = 'untitled', body, tags } = request.payload;
-        const noteId = await this._service.addNote({ title, body, tags });
+    async postSongsHandler(request, h) {
+        this._validator.validateSongPayload(request.payload);
+        const { title,genre,performer,duration,year,albumId } = request.payload;
+        const songId = await this._service.addSongs({ title,genre,performer,duration,year,albumId });
         const respone = h.response({
             status: 'success',
-            message: 'Catatan berhasil ditambahkan',
+            message: 'Song berhasil ditambahkan',
             data: {
-                noteId,
+              songId,
             },
         });
         respone.code(201);
-        return respone;
-        } catch (error) {
-            if (error instanceof ClientError) {
-                const response = h.response({
-                  status: 'fail',
-                  message: error.message,
-                });
-                response.code(error.statusCode);
-                return response;
-              }
-         
-              // Server ERROR!
-              const response = h.response({
-                status: 'error',
-                message: 'Maaf, terjadi kegagalan pada server kami.',
-              });
-              response.code(500);
-              console.error(error);
-              return response;                 
-        }
+        return respone;        
     }
-    async getOpenMusikHandler() {
-        const notes = await this._service.getNotes();
+    async getSongsHandler() {
+        const songs = await this._service.getSongs();
         return {
             status: 'success',
             data: {
-                notes,
+              songs,
             },
         };
     }
-    async getOpenMusikByIdHandler(request, h) {
-        try{
+    async getSongsByIdHandler(request, h) {
         const { id } = request.params;
-        const note = await this._service.getNoteById(id);
+        const song = await this._service.getSongsById(id);
         return {
             status: 'success',
             data: {
-                note,
+                song,
             },
-        };
-    } catch (error) {
-        if (error instanceof ClientError) {
-            const response = h.response({
-              status: 'fail',
-              message: error.message,
-            });
-            response.code(error.statusCode);
-            return response;
-          }
-     
-          // Server ERROR!
-          const response = h.response({
-            status: 'error',
-            message: 'Maaf, terjadi kegagalan pada server kami.',
-          });
-          response.code(500);
-          console.error(error);
-          return response;
-        }
-                
+        };            
     }
-    async putOpenMusikByIdHandler(request, h) {
-        try{
-        this._validator.validateNotePayload(request.payload);
-        const { title, body, tags } = request.payload;
+    async putSongsByIdHandler(request, h) {
+        this._validator.validateSongPayload(request.payload);
+        const { title,genre,performer,duration,year } = request.payload;
         const {id} = request.params;
-        await this._service.editNoteById(id, { title, body, tags });
+        await this._service.editSongsById({id, title, genre, performer, duration, year });
         return {
             status: 'success',
-            message: 'Catatan berhasil diperbarui',
+            message: 'Song berhasil diperbarui',
         };
-        } catch (error) {
-            if (error instanceof ClientError) {
-                const response = h.response({
-                  status: 'fail',
-                  message: error.message,
-                });
-                response.code(error.statusCode);
-                return response;
-              }
-         
-              // Server ERROR!
-              const response = h.response({
-                status: 'error',
-                message: 'Maaf, terjadi kegagalan pada server kami.',
-              });
-              response.code(500);
-              console.error(error);
-              return response;
-            }
-
     }
-    async deleteOpenMusikByIdHandler(request, h) {
-      try{
+    async deleteSongsByIdHandler(request, h) {
       const { id } = request.params;
-      await this._service.deleteNoteById(id);
+      await this._service.deleteSongsById(id);
         return {
             status: 'success',
-            message: 'Catatan berhasil dihapus',
+            message: 'Song berhasil dihapus',
         };
-    }catch(error){
-        if (error instanceof ClientError) {
-            const response = h.response({
-              status: 'fail',
-              message: error.message,
-            });
-            response.code(error.statusCode);
-            return response;
-          }
-     
-          // Server ERROR!
-          const response = h.response({
-            status: 'error',
-            message: 'Maaf, terjadi kegagalan pada server kami.',
-          });
-          response.code(500);
-          console.error(error);
-          return response;
-    }
     }
   }
 
-  module.exports = NotesHandler;
+  module.exports = SongsHandler;
