@@ -31,6 +31,8 @@ exports.up = pgm => {
       albumId: {
         type: 'TEXT',
         notNull: true,
+        references: '"albums"',
+        onDelete: 'cascade',
       },
 
     });

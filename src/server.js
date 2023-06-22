@@ -18,17 +18,31 @@ const SongValidator = require('./validator/songs');
 const users = require('./api/users');
 const UsersService = require('./services/postgres/UsersService');
 const UsersValidator = require('./validator/users');
+
 // authentications
 const authentications = require('./api/authentications');
 const AuthenticationsService = require('./services/postgres/AuthenticationsService');
 const TokenManager = require('./tokenize/TokenManager');
 const AuthenticationsValidator = require('./validator/authentications');
+
+// playlist
+const Playlist = require('./api/openmusik/playlists');
+const PlaylistService = require('./services/postgres/PlaylistsService');
+const PlaylistValidator = require('./validator/playlists');
+
+// playlist songs
+const PlaylistSongs = require('./api/openmusik/playlist-songs');
+const PlaylistSongsService = require('./services/postgres/PlaylistSongsService');
+const PlaylistSongsValidator = require('./validator/playlist-songs');
+
  
 const init = async () => {  
   const albumService = new AlbumService();  
   const songService = new SongsService();
   const usersService = new UsersService();
   const authenticationsService = new AuthenticationsService();
+  const playlistService = new PlaylistService();
+  const playlistSongsService = new PlaylistSongsService();
   const server = Hapi.server({
     port: process.env.PORT,
     host: process.env.HOST,
@@ -60,7 +74,7 @@ const init = async () => {
       },
     }),
   });
-
+  
   await server.register([
     {
     plugin: Album,
@@ -92,6 +106,20 @@ const init = async () => {
       validator: AuthenticationsValidator,
     },
   },
+  {
+    plugin: Playlist,
+    options: {
+      service: playlistService,
+      validator: PlaylistValidator,
+    },
+  },
+  {
+    plugin: PlaylistSongs,
+    options: {
+      service: playlistSongsService,
+      validator: PlaylistSongsValidator,
+    },
+  },
   ]);
   server.ext('onPreResponse', (request, h) => {
     // mendapatkan konteks response dari request
@@ -114,7 +142,7 @@ const init = async () => {
       // penanganan server error sesuai kebutuhan
       const newResponse = h.response({
         status: 'error',
-        message: 'terjadi kegagalan pada server kami :( \n'+ response.message,
+        message: 'terjadi kegagalan pada server kami :( '+ response.message,
       });
       newResponse.code(500);
       return newResponse;
