@@ -22,7 +22,7 @@ exports.up = pgm => {
       },
       duration: {
         type: 'INTEGER',
-        notNull: true,
+        notNull: false,
       },
       year: {
         type: 'INTEGER',
@@ -30,7 +30,7 @@ exports.up = pgm => {
       },
       albumId: {
         type: 'TEXT',
-        notNull: true,
+        notNull: false,
         references: '"albums"',
         onDelete: 'cascade',
       },
