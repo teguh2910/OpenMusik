@@ -35,6 +35,10 @@ const PlaylistSongs = require('./api/openmusik/playlist-songs');
 const PlaylistSongsService = require('./services/postgres/PlaylistSongsService');
 const PlaylistSongsValidator = require('./validator/playlist-songs');
 
+// Exports
+const _exports = require('./api/exports');
+const ProducerService = require('./services/rabbitmq/ProducerService');
+const ExportsValidator = require('./validator/exports');
  
 const init = async () => {  
   const albumService = new AlbumService();  
@@ -43,6 +47,7 @@ const init = async () => {
   const authenticationsService = new AuthenticationsService();
   const playlistService = new PlaylistService();
   const playlistSongsService = new PlaylistSongsService();
+  const producerService = new ProducerService();
   const server = Hapi.server({
     port: process.env.PORT,
     host: process.env.HOST,
@@ -118,6 +123,13 @@ const init = async () => {
     options: {
       service: playlistSongsService,
       validator: PlaylistSongsValidator,
+    },
+  },
+  {
+    plugin: _exports,
+    options: {
+      service: producerService,
+      validator: ExportsValidator,
     },
   },
   ]);
