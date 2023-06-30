@@ -15,7 +15,7 @@ class StorageService {
  
   async UpdateCover({ id, coverUrl }) {
     const query = {
-      text: 'UPDATE albums SET coverurl = $1 WHERE id = $2 RETURNING id',
+      text: 'UPDATE albums SET coverUrl = $1 WHERE id = $2 RETURNING id',
       values: [coverUrl,id],
     };
  

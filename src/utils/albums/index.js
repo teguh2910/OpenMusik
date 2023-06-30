@@ -2,12 +2,12 @@ const AlbumsmapDBToModel = ({
     id,
     name,
     year,
-    coverurl,
+    coverUrl,
   }) => ({
     id,
     name,
     year,
-    coverurl,
+    coverUrl,
   });
    
   module.exports = { AlbumsmapDBToModel };
