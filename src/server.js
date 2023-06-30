@@ -48,6 +48,11 @@ const uploads = require('./api/uploads');
 const StorageService = require('./services/storage/StorageService');
 const UploadsValidator = require('./validator/uploads');
 
+// like albums
+const LikeAlbums = require("./api/openmusik/like-albums");
+const LikeAlbumsService = require("./services/postgres/LikeAlbumsService");
+const CacheService = require("./services/redis/CacheService");
+
 
 const init = async () => {  
   const albumService = new AlbumService();  
@@ -58,6 +63,8 @@ const init = async () => {
   const playlistSongsService = new PlaylistSongsService();
   const producerService = new ProducerService();
   const storageService = new StorageService(path.resolve(__dirname, 'api/uploads/file/images'));
+  const cacheService = new CacheService();
+  const likeAlbumsService = new LikeAlbumsService(cacheService);
 
   const server = Hapi.server({
     port: process.env.PORT,
@@ -151,6 +158,13 @@ const init = async () => {
     options: {
       service: storageService,
       validator: UploadsValidator,
+    },
+  },
+  {
+    plugin: LikeAlbums,
+    options: {
+      service: likeAlbumsService,
+      albumService,
     },
   },
   ]);
