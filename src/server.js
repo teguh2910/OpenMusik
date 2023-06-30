@@ -3,6 +3,8 @@ const ClientError = require('./exceptions/ClientError');
 require('dotenv').config();
 const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
+const path = require('path');
+
 
 // albums
 const Album = require('./api/openmusik/albums');
@@ -39,7 +41,13 @@ const PlaylistSongsValidator = require('./validator/playlist-songs');
 const _exports = require('./api/exports');
 const ProducerService = require('./services/rabbitmq/ProducerService');
 const ExportsValidator = require('./validator/exports');
- 
+
+// uploads
+const uploads = require('./api/uploads');
+const StorageService = require('./services/storage/StorageService');
+const UploadsValidator = require('./validator/uploads');
+
+
 const init = async () => {  
   const albumService = new AlbumService();  
   const songService = new SongsService();
@@ -48,6 +56,8 @@ const init = async () => {
   const playlistService = new PlaylistService();
   const playlistSongsService = new PlaylistSongsService();
   const producerService = new ProducerService();
+  const storageService = new StorageService(path.resolve(__dirname, 'api/uploads/file/images'));
+
   const server = Hapi.server({
     port: process.env.PORT,
     host: process.env.HOST,
@@ -132,6 +142,13 @@ const init = async () => {
       validator: ExportsValidator,
     },
   },
+  {
+    plugin: uploads,
+    options: {
+      service: storageService,
+      validator: UploadsValidator,
+    },
+  },
   ]);
   server.ext('onPreResponse', (request, h) => {
     // mendapatkan konteks response dari request
@@ -154,9 +171,10 @@ const init = async () => {
       // penanganan server error sesuai kebutuhan
       const newResponse = h.response({
         status: 'error',
-        message: 'terjadi kegagalan pada server kami :( '+ response.message,
+        message: 'terjadi kegagalan pada server kami :( ',
       });
       newResponse.code(500);
+      console.error(response);
       return newResponse;
     }
     // jika bukan error, lanjutkan dengan response sebelumnya (tanpa terintervensi)
