@@ -35,7 +35,6 @@ class ProducerService {
     
         setTimeout(() => { 
             connection.close(); 
-            process.exit(0) 
             }
         , 1000);
     };
